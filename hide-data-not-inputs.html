@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Hide Data, Not Inputs |  Loud &amp; Abrasive: Patrick McVeety-Mill</title>
+<link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.png" >
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Montserrat+Alternates&family=Montserrat:wght@300&family=Vibur&display=swap" rel="stylesheet"> 
+<script src="https://kit.fontawesome.com/69fa8fd1fe.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="/assets/main.css">
+<link rel="stylesheet" href="/assets/syntax.css">
+
+<link rel="alternate" type="application/atom+xml" title="Loud &amp; Abrasive: Patrick McVeety-Mill" href="/feed.xml"/>
+<link rel="alternate" type="application/rss+xml"  title="Loud &amp; Abrasive: Patrick McVeety-Mill" href="/feed.xml"> 
+
+<script>
+  window.backOrHome = function() {
+    if(window.history.length <= 1){
+      window.location.replace('/')
+    } else{
+      history.back();
+    }
+  };
+</script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-49372703-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-49372703-1');
+</script>
+
+
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.1" />
+<meta property="og:title" content="Hide Data, Not Inputs" />
+<meta name="author" content="Patrick McVeety-Mill" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Today’s data-rich, dynamic internet can mean shoving context and metadata wherever you can to support content styling, drive data usage, or otherwise spruce up your UI. Recently I was tasked with sorting and grouping items in a list by date, with display headers over each group. The list item sort-by dates initially came from the server, so I was able to leverage Razor helpers to generate the headers. Things got complicated, however, when I needed to dynamically show or hide each header based on whether its contents matched the current filter settings. Luckily we were using Knockout, so a framework for fancy front-end logic was in place. My first inclination was to nest hidden inputs inside the header element. An element with a built-in “value” that isn’t shown by nature seemed like a good choice. I then captured those values when I created my Knockout viewmodels for the list headers:" />
+<meta property="og:description" content="Today’s data-rich, dynamic internet can mean shoving context and metadata wherever you can to support content styling, drive data usage, or otherwise spruce up your UI. Recently I was tasked with sorting and grouping items in a list by date, with display headers over each group. The list item sort-by dates initially came from the server, so I was able to leverage Razor helpers to generate the headers. Things got complicated, however, when I needed to dynamically show or hide each header based on whether its contents matched the current filter settings. Luckily we were using Knockout, so a framework for fancy front-end logic was in place. My first inclination was to nest hidden inputs inside the header element. An element with a built-in “value” that isn’t shown by nature seemed like a good choice. I then captured those values when I created my Knockout viewmodels for the list headers:" />
+<link rel="canonical" href="http://loudandabrasive.com/hide-data-not-inputs" />
+<meta property="og:url" content="http://loudandabrasive.com/hide-data-not-inputs" />
+<meta property="og:site_name" content="Loud &amp; Abrasive: Patrick McVeety-Mill" />
+<meta property="og:image" content="http://loudandabrasive.com/assets/default-card-image.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2014-08-14T15:05:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="http://loudandabrasive.com/assets/default-card-image.jpg" />
+<meta property="twitter:title" content="Hide Data, Not Inputs" />
+<meta name="twitter:site" content="@loudandabrasive" />
+<meta name="twitter:creator" content="@loudandabrasive" />
+<script type="application/ld+json">
+{"description":"Today’s data-rich, dynamic internet can mean shoving context and metadata wherever you can to support content styling, drive data usage, or otherwise spruce up your UI. Recently I was tasked with sorting and grouping items in a list by date, with display headers over each group. The list item sort-by dates initially came from the server, so I was able to leverage Razor helpers to generate the headers. Things got complicated, however, when I needed to dynamically show or hide each header based on whether its contents matched the current filter settings. Luckily we were using Knockout, so a framework for fancy front-end logic was in place. My first inclination was to nest hidden inputs inside the header element. An element with a built-in “value” that isn’t shown by nature seemed like a good choice. I then captured those values when I created my Knockout viewmodels for the list headers:","url":"http://loudandabrasive.com/hide-data-not-inputs","@type":"BlogPosting","image":"http://loudandabrasive.com/assets/default-card-image.jpg","headline":"Hide Data, Not Inputs","dateModified":"2014-08-14T15:05:00+00:00","datePublished":"2014-08-14T15:05:00+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://loudandabrasive.com/hide-data-not-inputs"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://loudandabrasive.com/assets/loudandalogo.png"},"name":"Patrick McVeety-Mill"},"author":{"@type":"Person","name":"Patrick McVeety-Mill"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+  <body>
+
+    <header class="top">
+  <div class="title-container">
+  <span class="subtitle">Patrick McVeety-Mill:</span>
+  <h1 class="title">
+    <a href="/">Loud &amp; Abrasive</a>
+  </h1>
+</div>
+
+<nav>
+  <input id="nav-toggle-check" name="nav-toggle-check" type="checkbox" class="nav-toggle" />
+  <label for="nav-toggle-check" class="nav-toggle">
+    <i class="fas fa-bars"></i>
+  </label>
+
+  <ul class="page-list">
+    
+      
+      
+        <li class="nav-link-vermilion">
+          <a href="/tech/index.html">
+            Tech <i class="fas fa-code-branch"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-orange">
+          <a href="/life/index.html">
+            Life <i class="fas fa-hiking"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-citron">
+          <a href="/arts/index.html">
+            Arts <i class="fas fa-paint-brush"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-teal">
+          <a href="/about/">
+            About <i class="fas fa-bullhorn"></i>
+          </a>
+        </li>
+      
+    
+    <li class="nav-link-charcoal">
+      <a href="/feed.xml" target="_blank" class="hover-charcoal">Subscribe <i class="fas fa-rss"></i></a>
+    </li>
+  </ul>
+
+  <hr class="stripes mobile-stripes" />
+</nav>
+
+</header>
+<hr class="stripes top-stripes" />
+
+<main class="site-content" aria-label="Content">
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Hide Data, Not Inputs</h1>
+    <div class="post-meta">
+      <div>
+        <span class="post-category vermilion">Development</span>
+        published
+        <time datetime="2014-08-14T15:05:00+00:00" itemprop="datePublished">
+          
+          Aug 14, 2014
+        </time>
+      </div>
+      
+        regarding html | javascript | how-to
+      
+    </div>
+  </header>
+
+  <div class="post-content" aria-label="Content" itemprop="articleBody">
+    <p>Today’s data-rich, dynamic internet can mean shoving context and metadata wherever you can to support content styling, drive data usage, or otherwise spruce up your UI. Recently I was tasked with sorting and grouping items in a list by date, with display headers over each group. The list item sort-by dates initially came from the server, so I was able to leverage Razor helpers to generate the headers. Things got complicated, however, when I needed to dynamically show or hide each header based on whether its contents matched the current filter settings. Luckily we were using <a href="http://knockoutjs.com/">Knockout</a>, so a framework for fancy front-end logic was in place.</p>
+
+<p>My first inclination was to nest hidden inputs inside the header element. An element with a built-in “value” that isn’t shown by nature seemed like a good choice. I then captured those values when I created my Knockout viewmodels for the list headers:
+<!--more--></p>
+
+<p><strong>Markup:</strong></p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"list-group-header"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"hidden"</span> <span class="na">name=</span><span class="s">"dateStart"</span> <span class="na">value=</span><span class="s">"@dateStart"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"hidden"</span> <span class="na">name=</span><span class="s">"dateEnd"</span> <span class="na">value=</span><span class="s">"@dateEnd"</span> <span class="nt">/&gt;</span>
+  <span class="c">&lt;!-- Header Content --&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+<p><strong>In the Viewmodel:</strong></p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">dateStart</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">headerElement</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="dl">"</span><span class="s2">input[type='hidden' [name='dateStart']</span><span class="dl">"</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">dateEnd</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">headerElement</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="dl">"</span><span class="s2">input[type='hidden' [name='dateEnd']</span><span class="dl">"</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+
+<span class="nx">header</span><span class="p">.</span><span class="nx">dateStart</span> <span class="o">=</span> <span class="nx">ko</span><span class="p">.</span><span class="nx">observable</span><span class="p">(</span><span class="nx">dateStart</span><span class="p">);</span>
+<span class="nx">header</span><span class="p">.</span><span class="nx">dateEnd</span> <span class="o">=</span> <span class="nx">ko</span><span class="p">.</span><span class="nx">observable</span><span class="p">(</span><span class="nx">dateEnd</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>While this got the job done, there were some issues. I had the data I needed to group the list items with the headers and check for the behavior I wanted on the viewmodel, but the markup doesn’t make much sense. An input belongs in a form, for something that the user could potentially change, or needs to be sent to the server. I could play around with other attributes on css-hidden elements, but that may not fly on some browsers, and still leaves the DOM cluttered with elements that aren’t representative of their purpose. Thankfully, there is a clearer option available.</p>
+
+<h3 id="the-data-attribute">The Data Attribute</h3>
+
+<p>The html <a href="http://www.w3.org/html/wg/drafts/html/master/dom.html#embedding-custom-non-visible-data-with-the-data-*-attributes">custom data attribute</a>, written as <code class="language-plaintext highlighter-rouge">data-x= "y"</code> has been around for more than a few years. If you’re familiar with Knockout, you have probably seen it in action with the <code class="language-plaintext highlighter-rouge">data-bind</code> attribute that’s used to tie your viewmodel observables to your html. What you may not have known is that the <code class="language-plaintext highlighter-rouge">bind</code> in <code class="language-plaintext highlighter-rouge">data-bind</code> is just a special word “reserved” by the framework. You can replace it with <em>anything you want</em> and subsequently access it in your javascript!</p>
+
+<p>In my case, this meant adding two data attribues on the header’s main element. That’s right, <em>you can add more than one of these bad boys</em> to your elements. So long as the names are unique, you can pile on as many you want. Here’s what I ended up with:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"list-group-header"</span> <span class="na">data-datestart=</span><span class="s">"@dateStart"</span> <span class="na">data-dateend=</span><span class="s">"@dateEnd"</span><span class="nt">&gt;</span>
+  <span class="c">&lt;!-- Header Content --&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+<p>Boy, that’s a lot cleaner. Then, in the Viewmodel:</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">dateStart</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">headerElement</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="dl">'</span><span class="s1">datestart</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">dateEnd</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">headerElement</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="dl">'</span><span class="s1">dateend</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="nx">header</span><span class="p">.</span><span class="nx">dateStart</span> <span class="o">=</span> <span class="nx">ko</span><span class="p">.</span><span class="nx">observable</span><span class="p">(</span><span class="nx">dateStart</span><span class="p">);</span>
+<span class="nx">header</span><span class="p">.</span><span class="nx">dateEnd</span> <span class="o">=</span> <span class="nx">ko</span><span class="p">.</span><span class="nx">observable</span><span class="p">(</span><span class="nx">dateEnd</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>As you can see, I utlized the jQuery <a href="http://api.jquery.com/jQuery.data/"><code class="language-plaintext highlighter-rouge">.data()</code></a> method to access the field, but you can also access the data attributes directly via <code class="language-plaintext highlighter-rouge">[element].dataset.[x]</code>. While the spec definition is older, the support is not, so you may have to fall back to using <code class="language-plaintext highlighter-rouge">[element].getAttribute</code> for older browsers.</p>
+
+<p>The front-end languages of the internet are fairly free-form and easy to bend to you needs, but it’s better to consider the purpose of your elements to keep your DOM clean and intent clear. Using the <code class="language-plaintext highlighter-rouge">data-*</code> attribute in place of hidden inputs <em>that aren’t actual inputs</em> provides access to data you need without misleading intent or cluttering your markup.</p>
+
+  </div>
+
+  <a class="outline-link" href="javascript:window.backOrHome()">
+    <i class="fas fa-chevron-left vermilion"><i class="fas fa-chevron-left orange"></i></i><i class="fas fa-chevron-left citron"></i><i class="fas fa-chevron-left teal"></i>
+    Return
+  </a>
+
+  
+</article>
+
+</main>
+
+
+    <hr class="footer-stripes" />
+
+<footer class="site-footer">
+  <span class="copy">&copy; 2021 Loud & Abrasive & Co.</span>
+  <ul class="social-links">
+    
+      
+      
+      <li><a href="https://twitter.com/loudandabrasive" title="Twitter" target="_blank"><i class="fab fa-twitter hover-vermilion"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://linkedin.com/in/pmcvtm" title="LinkedIn" target="_blank"><i class="fab fa-linkedin-in hover-orange"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://github.com/pmcvtm" title="Github" target="_blank"><i class="fab fa-github hover-citron"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://bandcamp.com/loudandabrasive" title="Bandcamp" target="_blank"><i class="fab fa-bandcamp hover-teal"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://letterboxd.com/loudandabrasive/" title="Letterboxd" target="_blank"><i class="fab fa-pied-piper hover-charcoal"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://untappd.com/user/loudandabrasive" title="Untappd" target="_blank"><i class="fab fa-untappd hover-vermilion"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://goodreads.com/loudandabrasive/" title="Goodreads" target="_blank"><i class="fab fa-goodreads-g hover-orange"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://instagram.com/loudandabrasive" title="Instagram" target="_blank"><i class="fab fa-instagram hover-citron"></i></a></li>
+      
+    
+    <li><a class="rss" title="Subscribe" target="_blank" href="/feed.xml"><i class="fas fa-rss"></i></a></li>
+  </ul>
+</footer>
+
+
+  </body>
+</html>

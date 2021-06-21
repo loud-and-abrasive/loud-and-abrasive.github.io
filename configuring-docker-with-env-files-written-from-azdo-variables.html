@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Configuring Docker with Env Files Written from Azure DevOps Variables |  Loud &amp; Abrasive: Patrick McVeety-Mill</title>
+<link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.png" >
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Montserrat+Alternates&family=Montserrat:wght@300&family=Vibur&display=swap" rel="stylesheet"> 
+<script src="https://kit.fontawesome.com/69fa8fd1fe.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="/assets/main.css">
+<link rel="stylesheet" href="/assets/syntax.css">
+
+<link rel="alternate" type="application/atom+xml" title="Loud &amp; Abrasive: Patrick McVeety-Mill" href="/feed.xml"/>
+<link rel="alternate" type="application/rss+xml"  title="Loud &amp; Abrasive: Patrick McVeety-Mill" href="/feed.xml"> 
+
+<script>
+  window.backOrHome = function() {
+    if(window.history.length <= 1){
+      window.location.replace('/')
+    } else{
+      history.back();
+    }
+  };
+</script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-49372703-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-49372703-1');
+</script>
+
+
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.1" />
+<meta property="og:title" content="Configuring Docker with Env Files Written from Azure DevOps Variables" />
+<meta name="author" content="Patrick McVeety-Mill" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I’ve become a big fan of Azure DevOps Pipelines. It’s a powerful and robust tool that enables really slick automated build and release processes. I wrote last about sexy auto-semversioning Nuget libraries using Build Pipelines. I’m still no expert in AzDO but am continuing to extend and improve the ways we leverage it. Recently I found a way to optimize against one of release pipelines’ biggest annoyances: app configuration for “non-transformable” config formats such as environment variables for Docker containers." />
+<meta property="og:description" content="I’ve become a big fan of Azure DevOps Pipelines. It’s a powerful and robust tool that enables really slick automated build and release processes. I wrote last about sexy auto-semversioning Nuget libraries using Build Pipelines. I’m still no expert in AzDO but am continuing to extend and improve the ways we leverage it. Recently I found a way to optimize against one of release pipelines’ biggest annoyances: app configuration for “non-transformable” config formats such as environment variables for Docker containers." />
+<link rel="canonical" href="http://loudandabrasive.com/configuring-docker-with-env-files-written-from-azdo-variables" />
+<meta property="og:url" content="http://loudandabrasive.com/configuring-docker-with-env-files-written-from-azdo-variables" />
+<meta property="og:site_name" content="Loud &amp; Abrasive: Patrick McVeety-Mill" />
+<meta property="og:image" content="http://loudandabrasive.com/assets/default-card-image.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-03-26T19:53:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="http://loudandabrasive.com/assets/default-card-image.jpg" />
+<meta property="twitter:title" content="Configuring Docker with Env Files Written from Azure DevOps Variables" />
+<meta name="twitter:site" content="@loudandabrasive" />
+<meta name="twitter:creator" content="@loudandabrasive" />
+<script type="application/ld+json">
+{"description":"I’ve become a big fan of Azure DevOps Pipelines. It’s a powerful and robust tool that enables really slick automated build and release processes. I wrote last about sexy auto-semversioning Nuget libraries using Build Pipelines. I’m still no expert in AzDO but am continuing to extend and improve the ways we leverage it. Recently I found a way to optimize against one of release pipelines’ biggest annoyances: app configuration for “non-transformable” config formats such as environment variables for Docker containers.","url":"http://loudandabrasive.com/configuring-docker-with-env-files-written-from-azdo-variables","@type":"BlogPosting","image":"http://loudandabrasive.com/assets/default-card-image.jpg","headline":"Configuring Docker with Env Files Written from Azure DevOps Variables","dateModified":"2019-03-26T19:53:00+00:00","datePublished":"2019-03-26T19:53:00+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://loudandabrasive.com/configuring-docker-with-env-files-written-from-azdo-variables"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://loudandabrasive.com/assets/loudandalogo.png"},"name":"Patrick McVeety-Mill"},"author":{"@type":"Person","name":"Patrick McVeety-Mill"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+  <body>
+
+    <header class="top">
+  <div class="title-container">
+  <span class="subtitle">Patrick McVeety-Mill:</span>
+  <h1 class="title">
+    <a href="/">Loud &amp; Abrasive</a>
+  </h1>
+</div>
+
+<nav>
+  <input id="nav-toggle-check" name="nav-toggle-check" type="checkbox" class="nav-toggle" />
+  <label for="nav-toggle-check" class="nav-toggle">
+    <i class="fas fa-bars"></i>
+  </label>
+
+  <ul class="page-list">
+    
+      
+      
+        <li class="nav-link-vermilion">
+          <a href="/tech/index.html">
+            Tech <i class="fas fa-code-branch"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-orange">
+          <a href="/life/index.html">
+            Life <i class="fas fa-hiking"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-citron">
+          <a href="/arts/index.html">
+            Arts <i class="fas fa-paint-brush"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-teal">
+          <a href="/about/">
+            About <i class="fas fa-bullhorn"></i>
+          </a>
+        </li>
+      
+    
+    <li class="nav-link-charcoal">
+      <a href="/feed.xml" target="_blank" class="hover-charcoal">Subscribe <i class="fas fa-rss"></i></a>
+    </li>
+  </ul>
+
+  <hr class="stripes mobile-stripes" />
+</nav>
+
+</header>
+<hr class="stripes top-stripes" />
+
+<main class="site-content" aria-label="Content">
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Configuring Docker with Env Files Written from Azure DevOps Variables</h1>
+    <div class="post-meta">
+      <div>
+        <span class="post-category vermilion">DevOps</span>
+        published
+        <time datetime="2019-03-26T19:53:00+00:00" itemprop="datePublished">
+          
+          Mar 26, 2019
+        </time>
+      </div>
+      
+        regarding azure-dev-ops | docker | configuration | powershell
+      
+    </div>
+  </header>
+
+  <div class="post-content" aria-label="Content" itemprop="articleBody">
+    <p>I’ve become a big fan of <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/">Azure DevOps Pipelines</a>. It’s a powerful and robust tool that enables really slick automated build and release processes. I wrote last about <a href="/effective-nuget-versioning-in-azure-devops">sexy auto-semversioning Nuget libraries</a> using Build Pipelines. I’m still no expert in AzDO but am continuing to extend and improve the ways we leverage it. Recently I found a way to optimize against one of release pipelines’ biggest annoyances: app configuration for “non-transformable” config formats such as environment variables for Docker containers. <!--more--></p>
+
+<p>Deploy tools like Azure DevOps Pipelines or <a href="https://octopus.com/">Octopus Deploy</a> allow setting environment- and process- scoped variables to be plugged into an application as it’s deployed. This can be a huge boon: it keeps secrets out of source control, enables sharing config values where convenient, and creates a single source-of-truth for the configuration of released applications. Often, the properly scoped variables are plugged in via file transforms or the a hosting platform automatically. By “non-transformable” config formats, I mean ones the toolset does not update in this fashion.</p>
+
+<p>For our system, this comes up most with “vanilla” Docker containers running on a VM: no Kubernetes, no cloud container instances, not even <code class="language-plaintext highlighter-rouge">docker-compose</code>, despite how these might ease orchestration. This is straightforward to set up in a release pipeline, either with the built-in <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/Docker?view=azure-devops#run-command">Docker task</a> or, in our case, calling the <code class="language-plaintext highlighter-rouge">docker</code> cli explicitly. We do this via a powershell script to enable looping to “scale” to a configured number of containers during a release. The following configuration technique became an obvious fit for this low-orchestration script or the built-in Docker task, however you may find it useful even with Kubernetes, Docker Swarm, or docker-compose’d services. Likewise, it can apply to other configuration formats that don’t fit into a tool’s “magic update” paradigm.</p>
+
+<h2 id="more-work-more-problems">More Work More Problems</h2>
+
+<p>For Docker, there are <a href="https://docs.Docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file">a few options</a> for passing configuration to a container at runtime, specifically as environment variables, which are then <a href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.configuration.environmentvariablesextensions.addenvironmentvariables?view=aspnetcore-2.2">scooped up by the application</a> at startup. Settings could also be transformed on a config file directly at <code class="language-plaintext highlighter-rouge">docker build</code>-time, but this eliminates the visibility into what is set with <code class="language-plaintext highlighter-rouge">docker inspect</code> or a similar tool. Unfortunately, none of these methods fit particularly well with Azure DevOps’s release pipeline variables.</p>
+
+<p>Initially, we opted to set variables that needed updating individually in our script with the <code class="language-plaintext highlighter-rouge">-e</code> (or <code class="language-plaintext highlighter-rouge">--env</code>) flag:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="w"> </span><span class="n">docker</span><span class="w"> </span><span class="nx">run</span><span class="w"> </span><span class="nt">-d</span><span class="w"> </span><span class="nt">-p</span><span class="w"> </span><span class="nx">80:5000</span><span class="w"> </span><span class="nt">--name</span><span class="w"> </span><span class="nx">my.api</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-e</span><span class="w"> </span><span class="nx">ConnectionStrings__AzureStorage</span><span class="o">=</span><span class="nv">$</span><span class="nn">env</span><span class="p">:</span><span class="nv">ConnectionStrings__AzureStorage</span><span class="w"> </span><span class="err">`</span><span class="w">
+    </span><span class="nt">-e</span><span class="w"> </span><span class="n">Serilog__Properties__Environment</span><span class="o">=</span><span class="nv">$</span><span class="nn">env</span><span class="p">:</span><span class="nv">Serilog__Properties__Environment</span><span class="w"> </span><span class="err">`</span><span class="w">
+    </span><span class="s2">"myregistry/my.api:2.11.2"</span><span class="w">
+</span></code></pre></div></div>
+
+<p>This was fine for one or two variables, but it got out of hand as the variable changed and grew. Besides setting the variables in the app and pipeline, each addition or removal required an update to the pipeline’s step(s), or a code change if the script was committed to the repository. As a lazy and typo-prone developer myself, this was totally unsustainable.</p>
+
+<h2 id="paring-to-prefixes">Paring to Prefixes</h2>
+
+<p>Now, instead of having the variable written in so many places, we leverage the list of all variables to our benefit. During an Azure DevOps Pipeline release, all scoped custom and built-in variables become environment variables on the agent. This is logged during the “Initialize job” step (some omitted for brevity):</p>
+
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">Environment variables available are below.  Note that these environment variables can be referred to in the task (in the ReleaseDefinition) by replacing "_" with "." e.g. AGENT_NAME environment variable can be referenced using Agent.Name in the ReleaseDefinition:
+</span><span class="gp">        [AGENT_DEPLOYMENTGROUPID] --&gt;</span><span class="w"> </span><span class="o">[</span>84]
+<span class="gp">        [AGENT_HOMEDIRECTORY] --&gt;</span><span class="w"> </span><span class="o">[</span>/home/myteam/azagent/azagent]
+<span class="gp">        [AGENT_OS] --&gt;</span><span class="w"> </span><span class="o">[</span>Linux]
+<span class="gp">        [AGENT_VERSION] --&gt;</span><span class="w"> </span><span class="o">[</span>2.148.1]
+<span class="gp">        [API_AUTHENTICATION__ENABLED] --&gt;</span><span class="w"> </span><span class="o">[</span><span class="nb">true</span><span class="o">]</span>
+<span class="gp">        [API_AUTHENTICATION__PASSWORD] --&gt;</span><span class="w"> </span><span class="o">[</span>AxjnxkekzDcaW8lwgKz/W8jdKXl68yUl/ATGqxOeeEs<span class="o">=]</span>
+</code></pre></div></div>
+
+<p>The last two in this list, prefixed with <code class="language-plaintext highlighter-rouge">API_</code>, are <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/release/variables#custom-variables">custom variables set in the pipeline</a>. The prefix in the key is important, as it allows separation of custom variables from Azure DevOps’s built-in ones. In powershell, given all environment variables <code class="language-plaintext highlighter-rouge">env:*</code> and a relevant <code class="language-plaintext highlighter-rouge">$prefix</code>, we can extract only those we’ve deemed to be set on the application config and write them to a file as <code class="language-plaintext highlighter-rouge">KEY=VALUE</code>:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$myEnvironmentFilePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c"># find, create, or clean file</span><span class="w">
+
+</span><span class="kr">ForEach</span><span class="p">(</span><span class="nv">$var</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="n">Get-ChildItem</span><span class="w"> </span><span class="nx">env:</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">$var</span><span class="o">.</span><span class="nf">Key</span><span class="o">.</span><span class="nf">StartsWith</span><span class="p">(</span><span class="nv">$prefix</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nv">$key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$var</span><span class="o">.</span><span class="nf">Key</span><span class="o">.</span><span class="nf">Substring</span><span class="p">(</span><span class="nv">$prefix</span><span class="o">.</span><span class="nf">Length</span><span class="p">)</span><span class="w">
+    </span><span class="nv">$value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$var</span><span class="o">.</span><span class="nf">Value</span><span class="w">
+    </span><span class="n">Add-Content</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="nv">$myEnvironmentFilePath</span><span class="w"> </span><span class="s2">"</span><span class="nv">$key</span><span class="s2">=</span><span class="nv">$value</span><span class="s2">"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="getting-fancy">Getting Fancy</h3>
+
+<p>If a pipeline relates to more than one application (or container), it’s possible to iterate over a set of prefixes, including a <code class="language-plaintext highlighter-rouge">SHARED_</code> one that all apps should pull in. Prefixes can be used to represent other scopes like machine kind, or release purpose, enabling a level of configuration specificity beyond just environment. It may serve to set the list of prefixes themselves as a pipeline variable that you can update at release-time to change config for special cases.</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#env:PREFIXES = API_,SHARED_,LOAD_TEST_</span><span class="w">
+</span><span class="nv">$prefixes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$</span><span class="nn">env</span><span class="p">:</span><span class="nv">PREFIXES</span><span class="o">.</span><span class="nf">Split</span><span class="p">(</span><span class="s1">','</span><span class="p">)</span><span class="w">
+</span><span class="kr">ForEach</span><span class="p">(</span><span class="nv">$var</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="n">Get-ChildItem</span><span class="w"> </span><span class="nx">env:</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="nv">$matchedPrefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="w">
+  </span><span class="kr">ForEach</span><span class="p">(</span><span class="nv">$prefix</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nv">$prefixes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">$var</span><span class="o">.</span><span class="nf">Key</span><span class="o">.</span><span class="nf">StartsWith</span><span class="p">(</span><span class="nv">$prefix</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">$matchedPrefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$prefix</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+
+  </span><span class="kr">if</span><span class="p">(</span><span class="nv">$matchedPrefix</span><span class="w"> </span><span class="o">-ne</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="w"> </span><span class="c">#continue as above...</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Once the file has been fully written, the <code class="language-plaintext highlighter-rouge">docker run</code> call changes from listing all variables with <code class="language-plaintext highlighter-rouge">-e</code> to the much more concise <code class="language-plaintext highlighter-rouge">--env-file</code>. If the call is in the same script as the config creation (or set as another pipeline variable), we can avoid hard-coding the environment file path:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">docker</span><span class="w"> </span><span class="nx">run</span><span class="w"> </span><span class="nt">-d</span><span class="w"> </span><span class="nt">-p</span><span class="w"> </span><span class="nx">80:5000</span><span class="w"> </span><span class="nt">--name</span><span class="w"> </span><span class="nx">my.api</span><span class="w"> </span><span class="nt">--env-file</span><span class="w"> </span><span class="nv">$myEnvironmentFilePath</span><span class="w"> </span><span class="s2">"myregistry/my.api:2.11.2"</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="other-applications">Other Applications</h2>
+
+<p>Besides Docker <code class="language-plaintext highlighter-rouge">.env</code> files, this method of iteration and prefixed extraction can be applied to plugging values into placeholders in <code class="language-plaintext highlighter-rouge">.ini</code> files, adding rows to an <code class="language-plaintext highlighter-rouge">.xml</code> config, or changing up a <code class="language-plaintext highlighter-rouge">json</code> object. Before getting out your big paintbrush, though, communicate with your team and agree on a standard for applying these. Save a baseline as a reference Task Group, or a shared script in a repository, and document it. As in software development, patterns are only useful when they’re followed, and should be scrutinized as they are applied to new situations.</p>
+
+  </div>
+
+  <a class="outline-link" href="javascript:window.backOrHome()">
+    <i class="fas fa-chevron-left vermilion"><i class="fas fa-chevron-left orange"></i></i><i class="fas fa-chevron-left citron"></i><i class="fas fa-chevron-left teal"></i>
+    Return
+  </a>
+
+  
+</article>
+
+</main>
+
+
+    <hr class="footer-stripes" />
+
+<footer class="site-footer">
+  <span class="copy">&copy; 2021 Loud & Abrasive & Co.</span>
+  <ul class="social-links">
+    
+      
+      
+      <li><a href="https://twitter.com/loudandabrasive" title="Twitter" target="_blank"><i class="fab fa-twitter hover-vermilion"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://linkedin.com/in/pmcvtm" title="LinkedIn" target="_blank"><i class="fab fa-linkedin-in hover-orange"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://github.com/pmcvtm" title="Github" target="_blank"><i class="fab fa-github hover-citron"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://bandcamp.com/loudandabrasive" title="Bandcamp" target="_blank"><i class="fab fa-bandcamp hover-teal"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://letterboxd.com/loudandabrasive/" title="Letterboxd" target="_blank"><i class="fab fa-pied-piper hover-charcoal"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://untappd.com/user/loudandabrasive" title="Untappd" target="_blank"><i class="fab fa-untappd hover-vermilion"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://goodreads.com/loudandabrasive/" title="Goodreads" target="_blank"><i class="fab fa-goodreads-g hover-orange"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://instagram.com/loudandabrasive" title="Instagram" target="_blank"><i class="fab fa-instagram hover-citron"></i></a></li>
+      
+    
+    <li><a class="rss" title="Subscribe" target="_blank" href="/feed.xml"><i class="fas fa-rss"></i></a></li>
+  </ul>
+</footer>
+
+
+  </body>
+</html>

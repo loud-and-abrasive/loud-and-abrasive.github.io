@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Xamarin Realm Query Disposal Gotcha |  Loud &amp; Abrasive: Patrick McVeety-Mill</title>
+<link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.png" >
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Montserrat+Alternates&family=Montserrat:wght@300&family=Vibur&display=swap" rel="stylesheet"> 
+<script src="https://kit.fontawesome.com/69fa8fd1fe.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="/assets/main.css">
+<link rel="stylesheet" href="/assets/syntax.css">
+
+<link rel="alternate" type="application/atom+xml" title="Loud &amp; Abrasive: Patrick McVeety-Mill" href="/feed.xml"/>
+<link rel="alternate" type="application/rss+xml"  title="Loud &amp; Abrasive: Patrick McVeety-Mill" href="/feed.xml"> 
+
+<script>
+  window.backOrHome = function() {
+    if(window.history.length <= 1){
+      window.location.replace('/')
+    } else{
+      history.back();
+    }
+  };
+</script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-49372703-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-49372703-1');
+</script>
+
+
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.1" />
+<meta property="og:title" content="Xamarin Realm Query Disposal Gotcha" />
+<meta name="author" content="Patrick McVeety-Mill" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="using More Than You’d Think Recently I’ve been getting my feet wet with mobile app development using Xamarin. It’s been a change of pace from the usual web fare, but it’s also familiar enough to not be afraid of. One notable difference from the concerns on the web is the importance of your app’s size on a phone, as well as how much processing and memory it uses. You don’t want to be the battery drainer! To both alleviate our in-memory load and more easily manage our app’s data stores, we are using Realm. Setting up Realm is straightforward, in part thanks to their nice set-up guide. Working with it, however, led to something unexpected." />
+<meta property="og:description" content="using More Than You’d Think Recently I’ve been getting my feet wet with mobile app development using Xamarin. It’s been a change of pace from the usual web fare, but it’s also familiar enough to not be afraid of. One notable difference from the concerns on the web is the importance of your app’s size on a phone, as well as how much processing and memory it uses. You don’t want to be the battery drainer! To both alleviate our in-memory load and more easily manage our app’s data stores, we are using Realm. Setting up Realm is straightforward, in part thanks to their nice set-up guide. Working with it, however, led to something unexpected." />
+<link rel="canonical" href="http://loudandabrasive.com/xamarin-realm-query-disposal-gotcha" />
+<meta property="og:url" content="http://loudandabrasive.com/xamarin-realm-query-disposal-gotcha" />
+<meta property="og:site_name" content="Loud &amp; Abrasive: Patrick McVeety-Mill" />
+<meta property="og:image" content="http://loudandabrasive.com/assets/default-card-image.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-09-16T17:24:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="http://loudandabrasive.com/assets/default-card-image.jpg" />
+<meta property="twitter:title" content="Xamarin Realm Query Disposal Gotcha" />
+<meta name="twitter:site" content="@loudandabrasive" />
+<meta name="twitter:creator" content="@loudandabrasive" />
+<script type="application/ld+json">
+{"description":"using More Than You’d Think Recently I’ve been getting my feet wet with mobile app development using Xamarin. It’s been a change of pace from the usual web fare, but it’s also familiar enough to not be afraid of. One notable difference from the concerns on the web is the importance of your app’s size on a phone, as well as how much processing and memory it uses. You don’t want to be the battery drainer! To both alleviate our in-memory load and more easily manage our app’s data stores, we are using Realm. Setting up Realm is straightforward, in part thanks to their nice set-up guide. Working with it, however, led to something unexpected.","url":"http://loudandabrasive.com/xamarin-realm-query-disposal-gotcha","@type":"BlogPosting","image":"http://loudandabrasive.com/assets/default-card-image.jpg","headline":"Xamarin Realm Query Disposal Gotcha","dateModified":"2016-09-16T17:24:00+00:00","datePublished":"2016-09-16T17:24:00+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://loudandabrasive.com/xamarin-realm-query-disposal-gotcha"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://loudandabrasive.com/assets/loudandalogo.png"},"name":"Patrick McVeety-Mill"},"author":{"@type":"Person","name":"Patrick McVeety-Mill"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+  <body>
+
+    <header class="top">
+  <div class="title-container">
+  <span class="subtitle">Patrick McVeety-Mill:</span>
+  <h1 class="title">
+    <a href="/">Loud &amp; Abrasive</a>
+  </h1>
+</div>
+
+<nav>
+  <input id="nav-toggle-check" name="nav-toggle-check" type="checkbox" class="nav-toggle" />
+  <label for="nav-toggle-check" class="nav-toggle">
+    <i class="fas fa-bars"></i>
+  </label>
+
+  <ul class="page-list">
+    
+      
+      
+        <li class="nav-link-vermilion">
+          <a href="/tech/index.html">
+            Tech <i class="fas fa-code-branch"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-orange">
+          <a href="/life/index.html">
+            Life <i class="fas fa-hiking"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-citron">
+          <a href="/arts/index.html">
+            Arts <i class="fas fa-paint-brush"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-teal">
+          <a href="/about/">
+            About <i class="fas fa-bullhorn"></i>
+          </a>
+        </li>
+      
+    
+    <li class="nav-link-charcoal">
+      <a href="/feed.xml" target="_blank" class="hover-charcoal">Subscribe <i class="fas fa-rss"></i></a>
+    </li>
+  </ul>
+
+  <hr class="stripes mobile-stripes" />
+</nav>
+
+</header>
+<hr class="stripes top-stripes" />
+
+<main class="site-content" aria-label="Content">
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Xamarin Realm Query Disposal Gotcha</h1>
+    <div class="post-meta">
+      <div>
+        <span class="post-category vermilion">Development</span>
+        published
+        <time datetime="2016-09-16T17:24:00+00:00" itemprop="datePublished">
+          
+          Sep 16, 2016
+        </time>
+      </div>
+      
+        regarding mobile | .net | xamarin
+      
+    </div>
+  </header>
+
+  <div class="post-content" aria-label="Content" itemprop="articleBody">
+    <h2 id="using-more-than-youd-think"><code class="language-plaintext highlighter-rouge">using</code> More Than You’d Think</h2>
+
+<p>Recently I’ve been getting my feet wet with mobile app development using <a href="https://www.xamarin.com/">Xamarin</a>. It’s been a change of pace from the usual web fare, but it’s also familiar enough to not be afraid of.</p>
+
+<p>One notable difference from the concerns on the web is the importance of your app’s size on a phone, as well as how much processing and memory it uses. You don’t want to be the battery drainer! To both alleviate our in-memory load and more easily manage our app’s data stores, we are using <a href="https://realm.io/">Realm</a>. Setting up Realm is straightforward, in part thanks to their <a href="https://realm.io/docs/xamarin/latest/#installation">nice set-up guide</a>. Working with it, however, led to something unexpected.</p>
+
+<!--more-->
+
+<h3 id="laziness">Laziness</h3>
+<p>Most robust ORM-type libraries I’ve worked with have had some notion of lazily loading objects from the data store (that is, only nabbing the parts you need as you need them). It’s handy. Usually, though, the tool also is smart about when to “solidify” or otherwise eager-fill the entirety of the object, such as before a connection is closed:</p>
+
+<div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">turbo</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Pupper</span><span class="p">();</span>
+<span class="k">using</span><span class="p">(</span><span class="kt">var</span> <span class="n">gonnegtion</span> <span class="p">=</span> <span class="n">PetStore</span><span class="p">.</span><span class="nf">Open</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="n">turbo</span> <span class="p">=</span> <span class="n">gonnegtion</span><span class="p">.</span><span class="n">All</span><span class="p">&lt;</span><span class="n">Pupper</span><span class="p">&gt;.</span><span class="nf">Single</span><span class="p">(</span><span class="n">x</span> <span class="p">=&gt;</span> <span class="n">x</span><span class="p">.</span><span class="n">Id</span> <span class="p">==</span> <span class="n">id</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>In the above, I would expect that after and outside the using block, <code class="language-plaintext highlighter-rouge">turbo</code> would be fully fleshed from whatever was saved in the <code class="language-plaintext highlighter-rouge">PetStore</code>. Unfortunately, this is not the case with Realm. Attempting to access an object outside of the block after populating it will throw a <code class="language-plaintext highlighter-rouge">Realms.RealmClosedException</code> at you.</p>
+
+<p>We find an indication of this semi-buried in the <a href="https://realm.io/docs/xamarin/latest/#more-query-examples">“Queries”</a> section of the documentation:</p>
+
+<blockquote>
+  <p>Objects are not copied - you get a list of references to the matching objects, and you work directly with the original objects that match your query.</p>
+</blockquote>
+
+<h3 id="there-you-have-it">There You Have It</h3>
+
+<p>Reading back, in their <a href="https://realm.io/docs/xamarin/latest/#getting-started">main example codeblock</a>, they don’t wrap their Realm instance in a <code class="language-plaintext highlighter-rouge">using</code> at all:</p>
+
+<div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">realm</span> <span class="p">=</span> <span class="n">Realm</span><span class="p">.</span><span class="nf">GetInstance</span><span class="p">();</span>
+
+<span class="c1">//... example contents</span>
+</code></pre></div></div>
+
+<p>Later they also point out when explaining <a href="https://realm.io/docs/xamarin/latest/#closing-realm-instances">Realms (Databases)</a> that you can close a Realm at any time. This might imply that you should just have one around and open and at-length, maybe even for the lifetime of the app.</p>
+
+<p>That option seems risky, but mobile development is new to me. Is Realm intended to be GetInstance()’d and closed willy nilly? Is that a normal pattern?
+If I find out, you’ll be the first to know.</p>
+
+  </div>
+
+  <a class="outline-link" href="javascript:window.backOrHome()">
+    <i class="fas fa-chevron-left vermilion"><i class="fas fa-chevron-left orange"></i></i><i class="fas fa-chevron-left citron"></i><i class="fas fa-chevron-left teal"></i>
+    Return
+  </a>
+
+  
+</article>
+
+</main>
+
+
+    <hr class="footer-stripes" />
+
+<footer class="site-footer">
+  <span class="copy">&copy; 2021 Loud & Abrasive & Co.</span>
+  <ul class="social-links">
+    
+      
+      
+      <li><a href="https://twitter.com/loudandabrasive" title="Twitter" target="_blank"><i class="fab fa-twitter hover-vermilion"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://linkedin.com/in/pmcvtm" title="LinkedIn" target="_blank"><i class="fab fa-linkedin-in hover-orange"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://github.com/pmcvtm" title="Github" target="_blank"><i class="fab fa-github hover-citron"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://bandcamp.com/loudandabrasive" title="Bandcamp" target="_blank"><i class="fab fa-bandcamp hover-teal"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://letterboxd.com/loudandabrasive/" title="Letterboxd" target="_blank"><i class="fab fa-pied-piper hover-charcoal"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://untappd.com/user/loudandabrasive" title="Untappd" target="_blank"><i class="fab fa-untappd hover-vermilion"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://goodreads.com/loudandabrasive/" title="Goodreads" target="_blank"><i class="fab fa-goodreads-g hover-orange"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://instagram.com/loudandabrasive" title="Instagram" target="_blank"><i class="fab fa-instagram hover-citron"></i></a></li>
+      
+    
+    <li><a class="rss" title="Subscribe" target="_blank" href="/feed.xml"><i class="fas fa-rss"></i></a></li>
+  </ul>
+</footer>
+
+
+  </body>
+</html>

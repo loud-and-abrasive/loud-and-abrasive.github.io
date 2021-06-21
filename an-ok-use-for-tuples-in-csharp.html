@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>An OK Use for Tuples in C# |  Loud &amp; Abrasive: Patrick McVeety-Mill</title>
+<link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.png" >
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Montserrat+Alternates&family=Montserrat:wght@300&family=Vibur&display=swap" rel="stylesheet"> 
+<script src="https://kit.fontawesome.com/69fa8fd1fe.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="/assets/main.css">
+<link rel="stylesheet" href="/assets/syntax.css">
+
+<link rel="alternate" type="application/atom+xml" title="Loud &amp; Abrasive: Patrick McVeety-Mill" href="/feed.xml"/>
+<link rel="alternate" type="application/rss+xml"  title="Loud &amp; Abrasive: Patrick McVeety-Mill" href="/feed.xml"> 
+
+<script>
+  window.backOrHome = function() {
+    if(window.history.length <= 1){
+      window.location.replace('/')
+    } else{
+      history.back();
+    }
+  };
+</script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-49372703-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-49372703-1');
+</script>
+
+
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.1" />
+<meta property="og:title" content="An OK Use for Tuples in C#" />
+<meta name="author" content="Patrick McVeety-Mill" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Tuples get a bad rap in C#, mostly because until recently they were a pain to work with. As of C# 7, they are much nicer, but I am still missing the instinct to use them. Last night a friend was streaming work on a side-project using the Unity game engine. It’s been too long for me to provide any help with geometry, but we started talking about readability when I saw a nice opportuplety." />
+<meta property="og:description" content="Tuples get a bad rap in C#, mostly because until recently they were a pain to work with. As of C# 7, they are much nicer, but I am still missing the instinct to use them. Last night a friend was streaming work on a side-project using the Unity game engine. It’s been too long for me to provide any help with geometry, but we started talking about readability when I saw a nice opportuplety." />
+<link rel="canonical" href="http://loudandabrasive.com/an-ok-use-for-tuples-in-csharp" />
+<meta property="og:url" content="http://loudandabrasive.com/an-ok-use-for-tuples-in-csharp" />
+<meta property="og:site_name" content="Loud &amp; Abrasive: Patrick McVeety-Mill" />
+<meta property="og:image" content="http://loudandabrasive.com/assets/default-card-image.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-04-15T15:12:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="http://loudandabrasive.com/assets/default-card-image.jpg" />
+<meta property="twitter:title" content="An OK Use for Tuples in C#" />
+<meta name="twitter:site" content="@loudandabrasive" />
+<meta name="twitter:creator" content="@loudandabrasive" />
+<script type="application/ld+json">
+{"description":"Tuples get a bad rap in C#, mostly because until recently they were a pain to work with. As of C# 7, they are much nicer, but I am still missing the instinct to use them. Last night a friend was streaming work on a side-project using the Unity game engine. It’s been too long for me to provide any help with geometry, but we started talking about readability when I saw a nice opportuplety.","url":"http://loudandabrasive.com/an-ok-use-for-tuples-in-csharp","@type":"BlogPosting","image":"http://loudandabrasive.com/assets/default-card-image.jpg","headline":"An OK Use for Tuples in C#","dateModified":"2021-04-15T15:12:00+00:00","datePublished":"2021-04-15T15:12:00+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://loudandabrasive.com/an-ok-use-for-tuples-in-csharp"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://loudandabrasive.com/assets/loudandalogo.png"},"name":"Patrick McVeety-Mill"},"author":{"@type":"Person","name":"Patrick McVeety-Mill"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+  <body>
+
+    <header class="top">
+  <div class="title-container">
+  <span class="subtitle">Patrick McVeety-Mill:</span>
+  <h1 class="title">
+    <a href="/">Loud &amp; Abrasive</a>
+  </h1>
+</div>
+
+<nav>
+  <input id="nav-toggle-check" name="nav-toggle-check" type="checkbox" class="nav-toggle" />
+  <label for="nav-toggle-check" class="nav-toggle">
+    <i class="fas fa-bars"></i>
+  </label>
+
+  <ul class="page-list">
+    
+      
+      
+        <li class="nav-link-vermilion">
+          <a href="/tech/index.html">
+            Tech <i class="fas fa-code-branch"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-orange">
+          <a href="/life/index.html">
+            Life <i class="fas fa-hiking"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-citron">
+          <a href="/arts/index.html">
+            Arts <i class="fas fa-paint-brush"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-teal">
+          <a href="/about/">
+            About <i class="fas fa-bullhorn"></i>
+          </a>
+        </li>
+      
+    
+    <li class="nav-link-charcoal">
+      <a href="/feed.xml" target="_blank" class="hover-charcoal">Subscribe <i class="fas fa-rss"></i></a>
+    </li>
+  </ul>
+
+  <hr class="stripes mobile-stripes" />
+</nav>
+
+</header>
+<hr class="stripes top-stripes" />
+
+<main class="site-content" aria-label="Content">
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">An OK Use for Tuples in C#</h1>
+    <div class="post-meta">
+      <div>
+        <span class="post-category vermilion">Development</span>
+        published
+        <time datetime="2021-04-15T15:12:00+00:00" itemprop="datePublished">
+          
+          Apr 15, 2021
+        </time>
+      </div>
+      
+        regarding tuples | c# | types
+      
+    </div>
+  </header>
+
+  <div class="post-content" aria-label="Content" itemprop="articleBody">
+    <p>Tuples get a bad rap in C#, mostly because until recently they were a pain to work with. As of C# 7, <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-tuples">they are much nicer</a>, but I am still missing the instinct to use them. Last night a friend was streaming work on a side-project using the <a href="https://unity.com/">Unity</a> game engine. It’s been too long for me to provide any help with geometry, but we started talking about readability when I saw a nice opportuplety.</p>
+
+<!--more-->
+
+<p>Specifically, my friend was working on a <a href="https://en.wikipedia.org/wiki/Perlin_noise">Perlin Noise</a> generator, used to make sets of random-but-smoothed-and-normalized numbers. Pop those numbers onto a 3-D grid and add some conditional lighting or color effects and you can have an attractive, real-ish-looking mountain landscape with little effort. Unity makes generating Perlin Noise <a href="https://docs.unity3d.com/ScriptReference/Mathf.PerlinNoise.html">very easy</a> so the work is distributing the noise over the space, or map.</p>
+
+<h2 id="expanding-signatures-elicit-confusion">Expanding Signatures Elicit Confusion</h2>
+
+<p>We won’t worry about the algorithm itself, just the method signature for generating the map of values:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="kt">float</span><span class="p">[,]</span> <span class="nf">CreateNoiseMap</span><span class="p">(</span><span class="kt">int</span> <span class="n">length</span><span class="p">,</span> <span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="kt">float</span> <span class="n">scale</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>After finishing the core generation, he added <em>origin</em> values that shift the center of the noise. To make the arguments clearer he also renamed the map dimension params:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="kt">float</span><span class="p">[,]</span> <span class="nf">CreateNoiseMap</span><span class="p">(</span><span class="kt">int</span> <span class="n">mapLength</span><span class="p">,</span> <span class="kt">int</span> <span class="n">mapWidth</span><span class="p">,</span> <span class="kt">float</span> <span class="n">scale</span><span class="p">,</span> <span class="kt">int</span> <span class="n">originX</span><span class="p">,</span> <span class="kt">int</span> <span class="n">originZ</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>This signature has  more potential to be confusing, especially if we give into temptation and shorten the names to save space and keystrokes:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="kt">float</span><span class="p">[,]</span> <span class="nf">CreateNoiseMap</span><span class="p">(</span><span class="kt">int</span> <span class="n">mapL</span><span class="p">,</span> <span class="kt">int</span> <span class="n">mapW</span><span class="p">,</span> <span class="kt">float</span> <span class="n">scale</span><span class="p">,</span> <span class="kt">int</span> <span class="n">oX</span><span class="p">,</span> <span class="kt">int</span> <span class="n">oZ</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>At least we’ve got <code class="language-plaintext highlighter-rouge">scale</code> to break up the two pairs on <code class="language-plaintext highlighter-rouge">int</code>s, but it’s all numbers, and if you’re not using an IDE that lists every argument name, or are like me and turned that off because it’s annoying, you’re likely to get them messed up:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="n">mapGenerator</span><span class="p">.</span><span class="nf">CreateNoiseMap</span><span class="p">(</span><span class="m">1000</span><span class="p">,</span> <span class="m">1000</span><span class="p">,</span> <span class="m">100f</span><span class="p">,</span> <span class="m">10</span><span class="p">,</span> <span class="m">10</span><span class="p">);</span> <span class="c1">// What are these values?!</span>
+</code></pre></div></div>
+
+<h2 id="refactoring-to-tuples">Refactoring to Tuples</h2>
+
+<p>That <em>Clean Code</em> book or a object orienteer might tell us to make a new class to hold these params like <code class="language-plaintext highlighter-rouge">NoiseMapOptions</code> or maybe a couple more potentially reusable ones like <code class="language-plaintext highlighter-rouge">MapDimensions2d</code> and <code class="language-plaintext highlighter-rouge">OriginPoint</code>.</p>
+
+<p>Having a dedicated “parameter container class” has its place, but is best when something outside of code does the populating (like a web request or messaging framework). Here, we are only using them in <code class="language-plaintext highlighter-rouge">CreateNoiseMap</code>, and calling it ourselves. Writing out parameter classes and then newing them up just to pass them in is too much work.</p>
+
+<p>Instead, we can tuple:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="kt">float</span><span class="p">[,]</span> <span class="nf">CreateNoiseMap</span><span class="p">((</span><span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="kt">int</span> <span class="n">length</span><span class="p">)</span> <span class="n">dimensions</span><span class="p">,</span> <span class="kt">float</span> <span class="n">scale</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">z</span><span class="p">)</span> <span class="n">origin</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>This signature isn’t any smaller, but our number pairs are now logically grouped. Those extra parentheses make it less likely to jumble values when calling the method. Even better, this might encourage using well-named tuples outside the method, instead of passing in variables or values.</p>
+
+<h3 id="before">Before:</h3>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">originX</span> <span class="p">=</span> <span class="m">10</span><span class="p">;</span>
+<span class="kt">var</span> <span class="n">originY</span> <span class="p">=</span> <span class="m">10</span><span class="p">;</span>
+
+<span class="n">mapGenerator</span><span class="p">.</span><span class="nf">CreateNoiseMap</span><span class="p">(</span><span class="m">1000</span><span class="p">,</span> <span class="m">1000</span><span class="p">,</span> <span class="m">100f</span><span class="p">,</span> <span class="n">originX</span><span class="p">,</span> <span class="n">originY</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="after">After:</h3>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">dimensions</span> <span class="p">=</span> <span class="p">(</span><span class="m">1000</span><span class="p">,</span><span class="m">1000</span><span class="p">);</span>
+<span class="kt">var</span> <span class="n">noiseOrigin</span> <span class="p">=</span> <span class="p">(</span><span class="m">10</span><span class="p">,</span> <span class="m">10</span><span class="p">);</span>
+
+<span class="n">mapGenerator</span><span class="p">.</span><span class="nf">CreateNoiseMap</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="m">100f</span><span class="p">,</span> <span class="n">noiseOrigin</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>A solution like this may be a six egg omelet to half a dozen donuts -style preference, but refactoring away from many same-typed args is the important part. And we can always come back and refactor our tuples into types / classes if the need presents; for example if the caller of <code class="language-plaintext highlighter-rouge">mapGenerator.CreateNoiseMap()</code> is <em>also</em> passing around the map dimensions.</p>
+
+<p>So next time you’re about to create a parameter container for a method, or have two or three related variables, maybe consider a Tuple instead!</p>
+
+  </div>
+
+  <a class="outline-link" href="javascript:window.backOrHome()">
+    <i class="fas fa-chevron-left vermilion"><i class="fas fa-chevron-left orange"></i></i><i class="fas fa-chevron-left citron"></i><i class="fas fa-chevron-left teal"></i>
+    Return
+  </a>
+
+  
+</article>
+
+</main>
+
+
+    <hr class="footer-stripes" />
+
+<footer class="site-footer">
+  <span class="copy">&copy; 2021 Loud & Abrasive & Co.</span>
+  <ul class="social-links">
+    
+      
+      
+      <li><a href="https://twitter.com/loudandabrasive" title="Twitter" target="_blank"><i class="fab fa-twitter hover-vermilion"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://linkedin.com/in/pmcvtm" title="LinkedIn" target="_blank"><i class="fab fa-linkedin-in hover-orange"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://github.com/pmcvtm" title="Github" target="_blank"><i class="fab fa-github hover-citron"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://bandcamp.com/loudandabrasive" title="Bandcamp" target="_blank"><i class="fab fa-bandcamp hover-teal"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://letterboxd.com/loudandabrasive/" title="Letterboxd" target="_blank"><i class="fab fa-pied-piper hover-charcoal"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://untappd.com/user/loudandabrasive" title="Untappd" target="_blank"><i class="fab fa-untappd hover-vermilion"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://goodreads.com/loudandabrasive/" title="Goodreads" target="_blank"><i class="fab fa-goodreads-g hover-orange"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://instagram.com/loudandabrasive" title="Instagram" target="_blank"><i class="fab fa-instagram hover-citron"></i></a></li>
+      
+    
+    <li><a class="rss" title="Subscribe" target="_blank" href="/feed.xml"><i class="fas fa-rss"></i></a></li>
+  </ul>
+</footer>
+
+
+  </body>
+</html>

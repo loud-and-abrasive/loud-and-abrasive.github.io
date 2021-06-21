@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Nuget Package Versioning in Azure DevOps with GitVersion |  Loud &amp; Abrasive: Patrick McVeety-Mill</title>
+<link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.png" >
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Montserrat+Alternates&family=Montserrat:wght@300&family=Vibur&display=swap" rel="stylesheet"> 
+<script src="https://kit.fontawesome.com/69fa8fd1fe.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="/assets/main.css">
+<link rel="stylesheet" href="/assets/syntax.css">
+
+<link rel="alternate" type="application/atom+xml" title="Loud &amp; Abrasive: Patrick McVeety-Mill" href="/feed.xml"/>
+<link rel="alternate" type="application/rss+xml"  title="Loud &amp; Abrasive: Patrick McVeety-Mill" href="/feed.xml"> 
+
+<script>
+  window.backOrHome = function() {
+    if(window.history.length <= 1){
+      window.location.replace('/')
+    } else{
+      history.back();
+    }
+  };
+</script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-49372703-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-49372703-1');
+</script>
+
+
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.1" />
+<meta property="og:title" content="Nuget Package Versioning in Azure DevOps with GitVersion" />
+<meta name="author" content="Patrick McVeety-Mill" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="If you blinked last year (or hiked the Appalachian trail) you may have missed Microsoft’s big continuous integration service redesign and rebranding; from Visual Studio Team Services to Azure DevOps. I’ve had the surprising pleasure to work extensively on the platform since returning; migrating my client’s CI/CD operations over to build and release pipelines in Azure DevOps. So far, it has been a dream, especially compared to my past experiences with VSTS. Microsoft’s documentation on Azure DevOps is fantastic, and I’m not looking to reinvent any wheels. Instead, I’ll share a success we’ve had with managing internal Nuget packages." />
+<meta property="og:description" content="If you blinked last year (or hiked the Appalachian trail) you may have missed Microsoft’s big continuous integration service redesign and rebranding; from Visual Studio Team Services to Azure DevOps. I’ve had the surprising pleasure to work extensively on the platform since returning; migrating my client’s CI/CD operations over to build and release pipelines in Azure DevOps. So far, it has been a dream, especially compared to my past experiences with VSTS. Microsoft’s documentation on Azure DevOps is fantastic, and I’m not looking to reinvent any wheels. Instead, I’ll share a success we’ve had with managing internal Nuget packages." />
+<link rel="canonical" href="http://loudandabrasive.com/effective-nuget-versioning-in-azure-devops" />
+<meta property="og:url" content="http://loudandabrasive.com/effective-nuget-versioning-in-azure-devops" />
+<meta property="og:site_name" content="Loud &amp; Abrasive: Patrick McVeety-Mill" />
+<meta property="og:image" content="http://loudandabrasive.com/assets/default-card-image.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-01-22T22:21:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="http://loudandabrasive.com/assets/default-card-image.jpg" />
+<meta property="twitter:title" content="Nuget Package Versioning in Azure DevOps with GitVersion" />
+<meta name="twitter:site" content="@loudandabrasive" />
+<meta name="twitter:creator" content="@loudandabrasive" />
+<script type="application/ld+json">
+{"description":"If you blinked last year (or hiked the Appalachian trail) you may have missed Microsoft’s big continuous integration service redesign and rebranding; from Visual Studio Team Services to Azure DevOps. I’ve had the surprising pleasure to work extensively on the platform since returning; migrating my client’s CI/CD operations over to build and release pipelines in Azure DevOps. So far, it has been a dream, especially compared to my past experiences with VSTS. Microsoft’s documentation on Azure DevOps is fantastic, and I’m not looking to reinvent any wheels. Instead, I’ll share a success we’ve had with managing internal Nuget packages.","url":"http://loudandabrasive.com/effective-nuget-versioning-in-azure-devops","@type":"BlogPosting","image":"http://loudandabrasive.com/assets/default-card-image.jpg","headline":"Nuget Package Versioning in Azure DevOps with GitVersion","dateModified":"2019-01-22T22:21:00+00:00","datePublished":"2019-01-22T22:21:00+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://loudandabrasive.com/effective-nuget-versioning-in-azure-devops"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://loudandabrasive.com/assets/loudandalogo.png"},"name":"Patrick McVeety-Mill"},"author":{"@type":"Person","name":"Patrick McVeety-Mill"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+  <body>
+
+    <header class="top">
+  <div class="title-container">
+  <span class="subtitle">Patrick McVeety-Mill:</span>
+  <h1 class="title">
+    <a href="/">Loud &amp; Abrasive</a>
+  </h1>
+</div>
+
+<nav>
+  <input id="nav-toggle-check" name="nav-toggle-check" type="checkbox" class="nav-toggle" />
+  <label for="nav-toggle-check" class="nav-toggle">
+    <i class="fas fa-bars"></i>
+  </label>
+
+  <ul class="page-list">
+    
+      
+      
+        <li class="nav-link-vermilion">
+          <a href="/tech/index.html">
+            Tech <i class="fas fa-code-branch"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-orange">
+          <a href="/life/index.html">
+            Life <i class="fas fa-hiking"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-citron">
+          <a href="/arts/index.html">
+            Arts <i class="fas fa-paint-brush"></i>
+          </a>
+        </li>
+      
+    
+      
+      
+        <li class="nav-link-teal">
+          <a href="/about/">
+            About <i class="fas fa-bullhorn"></i>
+          </a>
+        </li>
+      
+    
+    <li class="nav-link-charcoal">
+      <a href="/feed.xml" target="_blank" class="hover-charcoal">Subscribe <i class="fas fa-rss"></i></a>
+    </li>
+  </ul>
+
+  <hr class="stripes mobile-stripes" />
+</nav>
+
+</header>
+<hr class="stripes top-stripes" />
+
+<main class="site-content" aria-label="Content">
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Nuget Package Versioning in Azure DevOps with GitVersion</h1>
+    <div class="post-meta">
+      <div>
+        <span class="post-category vermilion">DevOps</span>
+        published
+        <time datetime="2019-01-22T22:21:00+00:00" itemprop="datePublished">
+          
+          Jan 22, 2019
+        </time>
+      </div>
+      
+        regarding azure-dev-ops | nuget | git
+      
+    </div>
+  </header>
+
+  <div class="post-content" aria-label="Content" itemprop="articleBody">
+    <p>If you blinked last year (or <a href="/incoming-at-updates">hiked the Appalachian trail</a>) you may have missed Microsoft’s big continuous integration service redesign and rebranding; from Visual Studio Team Services to <a href="https://dev.azure.com"><em>Azure DevOps</em></a>. I’ve had the surprising pleasure to work extensively on the platform since returning; migrating my client’s CI/CD operations over to build and release pipelines in Azure DevOps. So far, it has been a dream, especially compared to my past experiences with VSTS. Microsoft’s <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/">documentation</a> on Azure DevOps is fantastic, and I’m not looking to reinvent any wheels. Instead, I’ll share a success we’ve had with managing internal Nuget packages.<!--more--> These code libraries are used to ease and enforce communication between services in a distributed system that are sourced from multiple git repositories. It’s challenging enough planning and coordinating releases between versions of the services themselves; our client libraries should be easy to publish and even easier to track. Here are our goals:</p>
+
+<ul>
+  <li>version numbering is automatic, <em>but can be overridden</em></li>
+  <li>new production-ready versions are pushed automatically, <em>but anything can be pushed manually</em></li>
+  <li>source git repository is marked per each new release using tags, <em>no exceptions</em></li>
+</ul>
+
+<h2 id="mis-en-place"><em>Mis en place</em></h2>
+
+<p>The source of our Nuget package is written in dotnet core, and includes two projects: a C# class library that includes the consumable code, and another C# class library that has our unit tests. To keep things straightforward, our example repository is dedicated to this nuget package, with a simple branching strategy: a single <code class="language-plaintext highlighter-rouge">master</code> mainline, with <code class="language-plaintext highlighter-rouge">feature/*</code> branches to allow working on concurrent changes. To prepare Azure DevOps, we’ll complete <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started-yaml">this guide</a>: connect our GitHub account, select this repository, and create a new <strong>build pipeline</strong> with a blank <code class="language-plaintext highlighter-rouge">yaml</code> template to instruct its behavior.</p>
+
+<h2 id="set-the-version">Set the Version</h2>
+
+<p>First, we’ll define and set the version. To achieve our goal of automatic version-numbering, we’ll use <a href="https://github.com/GitTools/GitVersion">GitVersion</a>. GitVersion is a command line utility that leverages a repository’s commit history to generate a <a href="https://gitversion.readthedocs.io/en/latest/reference/intro-to-semver/">semantic version number</a>. It’s highly configurable, with a variety of modes to accommodate different branching and release strategies. We’ve got it easy, with just one mainline (<code class="language-plaintext highlighter-rouge">master</code>), which is a perfect fit for the <a href="https://gitversion.readthedocs.io/en/latest/reference/mainline-development/">Mainline Development mode</a>. This will increment the <em>patch</em> part for every merge into master (1.0.1 -&gt; 1.0.2). We can override this behavior with magic phrases in our commit messages, such as <code class="language-plaintext highlighter-rouge">+semver: minor</code>, to bump the <em>minor</em> part (1.0.1 -&gt; 1.1.0) or <code class="language-plaintext highlighter-rouge">+semver: skip</code> to not increment at all (1.0.1 -&gt; 1.0.1). In every GitVersion mode, <strong>tags are truth</strong>. Tagging a commit on master with <code class="language-plaintext highlighter-rouge">v#.#.#</code> will reset the baseline calculation regardless of what came before it. All these options are succinctly defined in a <strong>GitVersion.yml</strong> file, which for us is pleasantly boring:</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># GitVersion.yml</span>
+<span class="na">mode</span><span class="pi">:</span> <span class="s">Mainline</span>
+<span class="na">branches</span><span class="pi">:</span> <span class="pi">{}</span>
+<span class="na">ignore</span><span class="pi">:</span>
+  <span class="na">sha</span><span class="pi">:</span> <span class="pi">[]</span>
+</code></pre></div></div>
+
+<p>If you’re building on a Windows-based <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted">build agent</a>, there is a VSTS extension for GitVersion. We’re hep, though, and using Linux with dotnet core, so it doesn’t work. Instead, we’ll create steps to pull the tool from Nuget, and then call the executable using mono. We’ll specify we’re running GitVersion for CI with the <code class="language-plaintext highlighter-rouge">/output buildserver</code> option, which both changes the <code class="language-plaintext highlighter-rouge">Build.BuildNumber</code> to match the version, and exposes a collection of version-related <a href="https://gitversion.readthedocs.io/en/latest/more-info/variables/">variables</a>. The one we care about now is <code class="language-plaintext highlighter-rouge">GitVersion.NuGetVersion</code>. Here’s what our azure-pipelines.yml looks like:</p>
+
+<p><em>Note: For all our YAML steps, I’ve excluded the <code class="language-plaintext highlighter-rouge">displayName</code> option for brevity, but would highly encourage using it at home.</em></p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># azure-pipelines.yml</span>
+<span class="na">pool</span><span class="pi">:</span>
+  <span class="na">vmImage</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Ubuntu</span><span class="nv"> </span><span class="s">16.04'</span>
+
+<span class="na">steps</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">task</span><span class="pi">:</span> <span class="s">NuGetCommand@2</span>
+  <span class="na">inputs</span><span class="pi">:</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s">custom</span>
+    <span class="na">arguments</span><span class="pi">:</span> <span class="s">install GitVersion.CommandLine -Version 4.0.0 -OutputDirectory $(Build.BinariesDirectory)/tools -ExcludeVersion</span>
+<span class="pi">-</span> <span class="na">script</span><span class="pi">:</span> <span class="s">mono $(Build.BinariesDirectory)/tools/GitVersion.CommandLine/tools/GitVersion.exe /output buildserver /nofetch</span>
+</code></pre></div></div>
+
+<h2 id="do-the-work">Do the Work</h2>
+
+<p>The meat of our automated build is typical for a sexy modern .NET core project. After we set the version we’ll compile, run tests, and package our consumable library.</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># azure-pipelines.yml, continued</span>
+<span class="pi">-</span> <span class="na">script</span><span class="pi">:</span> <span class="s">dotnet build ./MyLibrary.sln -c Release /p:Version='$(GitVersion.NuGetVersion)'</span>
+<span class="pi">-</span> <span class="na">script</span><span class="pi">:</span> <span class="s">dotnet test ./src/MyLibraryTests/MyLibraryTests.csproj -c Release --no-build</span>
+<span class="pi">-</span> <span class="na">script</span><span class="pi">:</span> <span class="s">dotnet pack ./src/MyLibrary/MyLibrary.csproj -c Release --no-build -o '$(build.artifactStagingDirectory)'</span>
+</code></pre></div></div>
+
+<p>This option during compilation is noteworthy: <code class="language-plaintext highlighter-rouge">/p:Version='$(GitVersion.NuGetVersion)'</code>. The <code class="language-plaintext highlighter-rouge">/p:</code> flag is for MSBuild parameters (woof); here we’re setting built assemblies to use our automatically defined version. By using the <code class="language-plaintext highlighter-rouge">--no-build</code> flag on subsequent steps, we lock in the results of this initial compilation. We output our packaged library to the built-in staging location on the agent with <code class="language-plaintext highlighter-rouge">$(build.artifactStagingDirectory)</code>.</p>
+
+<p>There are <em>lots</em> of variations on this. For instance, we could set the project to automatically publish when it compiles, with the version set to the environment variable in the .csproj, or instead of <code class="language-plaintext highlighter-rouge">script:</code> steps we could leverage <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/dotnet-core-cli?view=vsts">Task</a> helpers. The <code class="language-plaintext highlighter-rouge">pack</code> command task even includes an option to set the package version by environment variable, like we’re doing here already.</p>
+
+<h2 id="publish-the-result">Publish the Result</h2>
+
+<p>After we’ve verified our code compiles, passes our tests, and packages nicely, we’ll push it to a Nuget feed to be then consumed. Azure DevOps includes a private Nuget feed in the form of <a href="https://azure.microsoft.com/en-us/services/devops/artifacts/">Azure Artifacts</a>, but you could just as easily publish your package to Nuget.org, ProGet, or any other feed. The Nuget pipeline task has a seamless option for integrating with Azure Artifacts, requiring only the magic identifier of the feed; using an internal authorization. Regardless of what hosts our feed, we’ll save the connection info in our pipeline as a variable to keep it secret, and allow reuse between our pipelines. Here’s our new step:</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">steps</span><span class="pi">:</span>
+<span class="c1"># azure-pipelines.yml, continued again</span>
+<span class="pi">-</span> <span class="na">task</span><span class="pi">:</span> <span class="s">NuGetCommand@2</span>
+  <span class="na">inputs</span><span class="pi">:</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s1">'</span><span class="s">push'</span>
+    <span class="na">packagesToPush</span><span class="pi">:</span> <span class="s1">'</span><span class="s">$(build.artifactStagingDirectory)/**/MyLibrary*.nupkg'</span>
+    <span class="na">publishVstsFeed</span><span class="pi">:</span> <span class="s1">'</span><span class="s">$(ARTIFACT_FEED_ID)'</span>
+  <span class="na">condition</span><span class="pi">:</span> <span class="s">and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq('true', variables['FORCE_PUSH_NUGET']))</span>
+</code></pre></div></div>
+
+<p>Unlike previous steps, this one is <em>conditional</em>. We don’t want to push a new package every time new code is pushed to the repository, especially for in-flight work. First, our <code class="language-plaintext highlighter-rouge">condition:</code> checks that previous steps succeeded. Then, we check if we’re on the master branch, which we trust is production-ready, or if a special flag to ‘force’ a new release has been set. To do this, we create a variable called <code class="language-plaintext highlighter-rouge">FORCE_PUSH_NUGET</code> in the pipeline settings that is <code class="language-plaintext highlighter-rouge">false</code> by default, and settable at queue-time (below, top). This variable will then appear when a new build is being queued (below, bottom).</p>
+
+<p><img src="/assets/post-resources/2019-01-22-effective-nuget-versioning-in-azure-devops-1-variable-setup.jpg" alt="A screenshot showing setting up a variable named FORCE_PUSH_NUGET in a build pipeline's settings" /></p>
+
+<p><img src="/assets/post-resources/2019-01-22-effective-nuget-versioning-in-azure-devops-2-queue-build.jpg" alt="A screenshot showing the queue build dialog with the FORCE_PUSH_NUGET variable set to 'true'" /></p>
+
+<p>When a package is pushed in this way, the automatically generated version will reflect that this is from a feature branch by appending a <em>-tag</em> (1.0.1 -&gt; 1.0.1-my-feature-branch) to the version, and Nuget will flag it as prerelease. This way, users can deliberately use this version, but we minimize accidental pulls from upgrading or installing the package new.</p>
+
+<p><img src="/assets/post-resources/2019-01-22-effective-nuget-versioning-in-azure-devops-3-package-list.jpg" alt="A screenshot of the Azure Artifact feed, showing the list of packages and their corresponding versions" /></p>
+
+<h2 id="tag-the-repo">Tag the Repo</h2>
+
+<p>Now that the Nuget package is live, we want our consumers to be able to look up <em>what exactly</em> they’ve signed up for. This could be out of curiosity, for feature requests, or more likely, because <strong>something is wrong</strong>. Since we’re using GitVersion, users <em>could</em> work their way backwards to a specific commit, but because we’re empathy-driven, we’ll make it easy to look up by adding a <a href="https://git-scm.com/book/en/v2/Git-Basics-Tagging">git tag</a> that matches the version of this release. There are a few extensions that provide this functionality in Azure DevOps, but we’ll go with <a href="https://github.com/mikaelkrief/GitHub-Tools-vsts-extensions/wiki/Tag-GitHub-source-code">this one</a> for our example. Using our <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/github">GitHub connection</a> from that starting guide, it infers the source repository and adds a tag we specify. The step ends up looking like this:</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># azure-pipelines.yml, continued one more time</span>
+<span class="pi">-</span> <span class="na">task</span><span class="pi">:</span> <span class="s">KriefMikael.githubtools.GitHubTag.GitHubTag@1</span>
+  <span class="na">inputs</span><span class="pi">:</span>
+    <span class="na">githubEndpoint</span><span class="pi">:</span> <span class="s">myGithubConnection</span>
+    <span class="na">tag</span><span class="pi">:</span> <span class="s1">'</span><span class="s">v$(GitVersion.NuGetVersion)'</span>
+  <span class="na">condition</span><span class="pi">:</span> <span class="s">and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq('true', variables['FORCE_PUSH_NUGET']))</span>
+</code></pre></div></div>
+
+<p>Here again we have the <code class="language-plaintext highlighter-rouge">condition:</code> from the push step, since we only want to tag when we publish a new package. We also see our <code class="language-plaintext highlighter-rouge">GitVersion.NuGetVersion</code> variable in action again, prepended with ‘v’ to be clear what the number means. It may seem excessive to tag every release, when we release on every merge into <code class="language-plaintext highlighter-rouge">master</code>. Tags guarantee users will be able to pair a package’s behavior to source code, however, especially when we’re lazy about release notes. As a bonus, GitVersion works faster, since counting commits takes time. The latest tag serves as the starting point for calculating the next version, so it never has to count very high. Tags can be viewed from the command line with <code class="language-plaintext highlighter-rouge">git tag -l</code>, where they can also be checked out (in a detached HEAD), but they’ll also be visible in GitHub:</p>
+
+<p><img src="/assets/post-resources/2019-01-22-effective-nuget-versioning-in-azure-devops-4-github-tags.jpg" alt="A screenshot of a GitHub repository with the &quot;tags&quot; dropdown open, showing a list of version tags" /></p>
+
+<h2 id="now-you">Now You</h2>
+
+<p>This example is pretty minimal, and might not match how you or your team organizes code or releases. This pattern can be adapted for a second mainline to release from, other versioning strategies, or push frequencies. Change the <code class="language-plaintext highlighter-rouge">GitVersion.yml</code> config and the conditions for pushing new packages to match your needs. The <em>how</em> of this is less important than the <em>why</em>: We use these tools (continuous integration, Nuget, GitVersion) to make our lives, and the lives of those we work with, easier. Release often, tag your repository for visibility, and automate as much as you can, and you can take comfort in knowing you probably helped someone today.</p>
+
+  </div>
+
+  <a class="outline-link" href="javascript:window.backOrHome()">
+    <i class="fas fa-chevron-left vermilion"><i class="fas fa-chevron-left orange"></i></i><i class="fas fa-chevron-left citron"></i><i class="fas fa-chevron-left teal"></i>
+    Return
+  </a>
+
+  
+</article>
+
+</main>
+
+
+    <hr class="footer-stripes" />
+
+<footer class="site-footer">
+  <span class="copy">&copy; 2021 Loud & Abrasive & Co.</span>
+  <ul class="social-links">
+    
+      
+      
+      <li><a href="https://twitter.com/loudandabrasive" title="Twitter" target="_blank"><i class="fab fa-twitter hover-vermilion"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://linkedin.com/in/pmcvtm" title="LinkedIn" target="_blank"><i class="fab fa-linkedin-in hover-orange"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://github.com/pmcvtm" title="Github" target="_blank"><i class="fab fa-github hover-citron"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://bandcamp.com/loudandabrasive" title="Bandcamp" target="_blank"><i class="fab fa-bandcamp hover-teal"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://letterboxd.com/loudandabrasive/" title="Letterboxd" target="_blank"><i class="fab fa-pied-piper hover-charcoal"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://untappd.com/user/loudandabrasive" title="Untappd" target="_blank"><i class="fab fa-untappd hover-vermilion"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://goodreads.com/loudandabrasive/" title="Goodreads" target="_blank"><i class="fab fa-goodreads-g hover-orange"></i></a></li>
+      
+    
+      
+      
+      <li><a href="https://instagram.com/loudandabrasive" title="Instagram" target="_blank"><i class="fab fa-instagram hover-citron"></i></a></li>
+      
+    
+    <li><a class="rss" title="Subscribe" target="_blank" href="/feed.xml"><i class="fas fa-rss"></i></a></li>
+  </ul>
+</footer>
+
+
+  </body>
+</html>
